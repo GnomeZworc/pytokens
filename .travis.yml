@@ -6,6 +6,7 @@ install:
  - pip install -r requirements_test.txt
 before_script:
  - python app/api.py &
+ - PORT=8001 TOKEN=32ewD9S7NbWBx5sN7JpX6S8WhoZLU71a0PBF9Yekwy2Uj7S3zuBDwW0IYRkpGaS8 python app/api.py &
 script:
  - pytest -v
 after_script:
