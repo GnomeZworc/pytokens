@@ -5,6 +5,7 @@
 
 from wsgiref.simple_server import make_server
 from pycnic.core import WSGI, Handler
+from variables import env
 
 class Home(Handler):
     def get(self):
@@ -16,8 +17,8 @@ class app(WSGI):
     ]
 
 try:
-    print("Serving on 0.0.0.0:8080...")
-    make_server('0.0.0.0', 8080, app).serve_forever()
+    print("Serving on " + env("HOST") + ":" + env("PORT") + "...")
+    make_server(env("HOST"), int(env("PORT")), app).serve_forever()
 except KeyboardInterrupt:
     pass
 print("\nServeur Stop")
