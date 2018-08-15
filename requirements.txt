@@ -1,2 +1,2 @@
-pycnic
-gunicorn
+pycnic==0.1.3
+gunicorn==19.9.0
