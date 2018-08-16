@@ -3,6 +3,8 @@
 #
 #!/usr/bin/python3
 
+import datetime
+
 from wsgiref.simple_server import make_server
 from pycnic.core import WSGI, Handler
 from pycnic.errors import HTTP_401
@@ -18,9 +20,15 @@ class mongo():
     def __init__(self, host='127.0.0.1', port='80', database='database', protocol='mongodb'):
         self.connect = MongoClient(protocol + "://" + host + ":" + port + "/")
         self.db = self.connect[database]
+        self.logs("api start")
     def close(self):
         self.connect.close()
         self.logs("api stop")
+    def logs(self, message):
+        elem = {}
+        elem["timestamp"] = datetime.datetime.now()
+        elem["message"] = message
+        self.db["api_tokens_logs"].insert_one(elem)
 
 Database = None
 
