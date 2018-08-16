@@ -42,7 +42,9 @@ def require():
     def wrapper(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
+            Database.logs("connect in " + args[0].request.path + " from " + args[0].request.ip)
             if check_head_token(args[0].request) == False:
+                Database.logs("try to connect from " + args[0].request.ip + " with bad token")
                 raise HTTP_401("bad token")
             return f(*args, **kwargs)
         return wrapped
