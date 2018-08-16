@@ -25,3 +25,6 @@ class mongo():
         elem["timestamp"] = datetime.datetime.now()
         elem["message"] = message
         self.db[self.api_name + "_logs"].insert_one(elem)
+    def insert(self, collection, elem):
+        self.db[collection].insert_one(elem)
+        self.logs("add elem in " + collection)
