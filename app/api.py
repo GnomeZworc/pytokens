@@ -12,9 +12,15 @@ from pymongo import MongoClient
 
 
 class mongo():
+    connect = None
     db = None
+
     def __init__(self, host='127.0.0.1', port='80', database='database', protocol='mongodb'):
-        self.db = MongoClient(protocol + "://" + host + ":" + port + "/")[database]
+        self.connect = MongoClient(protocol + "://" + host + ":" + port + "/")
+        self.db = self.connect[database]
+    def close(self):
+        self.connect.close()
+        self.logs("api stop")
 
 Database = None
 
@@ -50,4 +56,5 @@ try:
     make_server(env("HOST"), int(env("PORT")), app).serve_forever()
 except KeyboardInterrupt:
     pass
+Database.close()
 print("\nServeur Stop")
