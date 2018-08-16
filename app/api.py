@@ -16,8 +16,10 @@ from pymongo import MongoClient
 class mongo():
     connect = None
     db = None
+    api_name = None
 
-    def __init__(self, host='127.0.0.1', port='80', database='database', protocol='mongodb'):
+    def __init__(self, host='127.0.0.1', port='80', database='database', protocol='mongodb', api=''):
+        self.api_name = api
         self.connect = MongoClient(protocol + "://" + host + ":" + port + "/")
         self.db = self.connect[database]
         self.logs("api start")
@@ -28,7 +30,7 @@ class mongo():
         elem = {}
         elem["timestamp"] = datetime.datetime.now()
         elem["message"] = message
-        self.db["api_tokens_logs"].insert_one(elem)
+        self.db[self.api_name + "_logs"].insert_one(elem)
 
 Database = None
 
@@ -62,7 +64,7 @@ class app(WSGI):
 
 try:
     print("Serving on " + env("HOST") + ":" + env("PORT") + "...")
-    Database = mongo(host=env("MONGO_HOST"), port=env("MONGO_PORT"), database=env("MONGO_DATABASE"), protocol=env("MONGO_PROTOCOL"))
+    Database = mongo(host=env("MONGO_HOST"), port=env("MONGO_PORT"), database=env("MONGO_DATABASE"), protocol=env("MONGO_PROTOCOL"), api=env("API_NAME"))
     make_server(env("HOST"), int(env("PORT")), app).serve_forever()
 except KeyboardInterrupt:
     pass
