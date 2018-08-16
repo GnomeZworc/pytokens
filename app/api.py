@@ -8,6 +8,15 @@ from pycnic.core import WSGI, Handler
 from pycnic.errors import HTTP_401
 from functools import wraps
 from variables import env
+from pymongo import MongoClient
+
+
+class mongo():
+    db = None
+    def __init__(self, host='127.0.0.1', port='80', database='database', protocol='mongodb'):
+        self.db = MongoClient(protocol + "://" + host + ":" + port + "/")[database]
+
+Database = None
 
 def check_head_token(request):
     token = request.get_header("token")
@@ -37,6 +46,7 @@ class app(WSGI):
 
 try:
     print("Serving on " + env("HOST") + ":" + env("PORT") + "...")
+    Database = mongo(host=env("MONGO_HOST"), port=env("MONGO_PORT"), database=env("MONGO_DATABASE"), protocol=env("MONGO_PROTOCOL"))
     make_server(env("HOST"), int(env("PORT")), app).serve_forever()
 except KeyboardInterrupt:
     pass
