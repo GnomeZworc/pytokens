@@ -5,32 +5,15 @@
 
 from wsgiref.simple_server import make_server
 from pycnic.core import WSGI, Handler
-from pycnic.errors import HTTP_401
 from functools import wraps
 from variables import env
 from database import mongo
-Database = None
+from require import require
 
-def check_head_token(request):
-    token = request.get_header("token")
-    if token and token == env("TOKEN"):
-        return True
-    return False
-
-def require():
-    def wrapper(f):
-        @wraps(f)
-        def wrapped(*args, **kwargs):
-            Database.logs("connect in " + args[0].request.path + " from " + args[0].request.ip)
-            if check_head_token(args[0].request) == False:
-                Database.logs("try to connect from " + args[0].request.ip + " with bad token")
-                raise HTTP_401("bad token")
-            return f(*args, **kwargs)
-        return wrapped
-    return wrapper
+Database = mongo(host=env("MONGO_HOST"), port=env("MONGO_PORT"), database=env("MONGO_DATABASE"), protocol=env("MONGO_PROTOCOL"), api=env("API_NAME"))
 
 class Home(Handler):
-    @require()
+    @require(Database)
     def get(self):
         return {"message":"hello"}
 
@@ -41,7 +24,6 @@ class app(WSGI):
 
 try:
     print("Serving on " + env("HOST") + ":" + env("PORT") + "...")
-    Database = mongo(host=env("MONGO_HOST"), port=env("MONGO_PORT"), database=env("MONGO_DATABASE"), protocol=env("MONGO_PROTOCOL"), api=env("API_NAME"))
     make_server(env("HOST"), int(env("PORT")), app).serve_forever()
 except KeyboardInterrupt:
     pass
