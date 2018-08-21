@@ -12,25 +12,31 @@ class TestCreateToken():
     def get_response(self, url, head={}, port=80, data='{}'):
         response = post(url + ":" + str(port) + "/create", headers=head, data = data)
         return response
-    def test_base_create_without_data(self):
+    def test_create_without_data(self):
         headers = {'token':first_token}
         assert self.get_response(base_url, head=headers, port=first_port).status_code == 400
-    def test_base_create_without_id(self):
+    def test_create_without_id(self):
         headers = {'token':first_token}
         datas = '{"source":"perso", "limit_time":0}'
         assert self.get_response(base_url, head=headers, port=first_port, data=datas).status_code == 400
-    def test_base_create_without_time_limit(self):
+    def test_create_without_time_limit(self):
         headers = {'token':first_token}
         datas = '{"source":"perso", "id":1}'
         assert self.get_response(base_url, head=headers, port=first_port, data=datas).status_code == 400
-    def test_base_create_without_source(self):
+    def test_create_without_source(self):
         headers = {'token':first_token}
         datas = '{"id":1, "limit_time":0}'
         assert self.get_response(base_url, head=headers, port=first_port, data=datas).status_code == 400
-    def test_base_create_with_data(self):
+    def test_create_with_data(self):
         headers = {'token':first_token}
         datas = '{"source":"perso","id":1,"limit_time":0}'
         assert self.get_response(base_url, head=headers, port=first_port, data=datas).status_code == 200
+    def test_create_with_no_duplicate(self):
+        headers = {'token':first_token}
+        datas = '{"source":"perso","id":1,"limit_time":0}'
+        first = self.get_response(base_url, head=headers, port=first_port, data=datas).json()["token"]
+        second =  self.get_response(base_url, head=headers, port=first_port, data=datas).json()["token"]
+        assert first == second
 
 class TestApiBase():
     def get_response(self, url, head={}, port=80):
