@@ -26,5 +26,10 @@ class mongo():
         elem["message"] = message
         self.db[self.api_name + "_logs"].insert_one(elem)
     def insert(self, collection, elem):
+        collection = self.api_name + "_" + collection
         self.db[collection].insert_one(elem)
         self.logs("add elem in " + collection)
+    def findOne(self, collection, find):
+        collection = self.api_name + "_" + collection
+        self.logs("find one " + str(find) + " in " + collection)
+        return self.db[collection].find_one(find)
