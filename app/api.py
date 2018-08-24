@@ -45,6 +45,27 @@ class CreatToken(Handler):
         Database.insert("tokens", elem)
         return {"message":"new token is create", "token":str(token)}
 
+class CheckToken(Handler):
+    @require(Database)
+    def post(self):
+        source = self.request.data.get("source")
+        token = self.request.data.get("token")
+        if source == None or token == None:
+            raise HTTP_400("we need source and token")
+        message = "this token is "
+        ret = Database.findOne("tokens", {"source":source,"token":token})
+        retour = {}
+        if ret != None:
+            message += "valid"
+            retour["is_valid"] = 1
+            retour["id"] = ret["source_id"]
+        else:
+            message += "not valid"
+            retour["is_valid"] = 0
+        retour["message"] = message
+        return retour
+
+
 class app(WSGI):
     routes = [
         ('/', Home()),
