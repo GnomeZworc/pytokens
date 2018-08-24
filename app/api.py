@@ -69,7 +69,8 @@ class CheckToken(Handler):
 class app(WSGI):
     routes = [
         ('/', Home()),
-        ('/create', CreatToken())
+        ('/create', CreatToken()),
+        ('/check', CheckToken())
     ]
 
 try:
