@@ -31,7 +31,7 @@ class CreatToken(Handler):
         limit_time = self.request.data.get("limit_time")
         if source == None or source_id == None or limit_time == None:
             raise HTTP_400("we need source, id and limit_time (0 = unlimited)")
-        ret = Database.findOne("tokens", {"source_id":source_id})
+        ret = Database.findOne("tokens", {"source_id":source_id, "source":source})
         if ret != None:
             return {"message":"token already existe for this user", "token":str(ret["token"])}
         token = generate_token()
