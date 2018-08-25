@@ -31,7 +31,7 @@ class CreatToken(Handler):
         limit_time = self.request.data.get("limit_time")
         if source == None or source_id == None or limit_time == None:
             raise HTTP_400("we need source, id and limit_time (0 = unlimited)")
-        ret = Database.findOne("tokens", {"source_id":source_id})
+        ret = Database.findOne("tokens", {"source_id":source_id, "source":source})
         if ret != None:
             return {"message":"token already existe for this user", "token":str(ret["token"])}
         token = generate_token()
@@ -45,10 +45,32 @@ class CreatToken(Handler):
         Database.insert("tokens", elem)
         return {"message":"new token is create", "token":str(token)}
 
+class CheckToken(Handler):
+    @require(Database)
+    def post(self):
+        source = self.request.data.get("source")
+        token = self.request.data.get("token")
+        if source == None or token == None:
+            raise HTTP_400("we need source and token")
+        message = "this token is "
+        ret = Database.findOne("tokens", {"source":source,"token":token})
+        retour = {}
+        if ret != None:
+            message += "valid"
+            retour["is_valid"] = 1
+            retour["id"] = int(ret["source_id"])
+        else:
+            message += "not valid"
+            retour["is_valid"] = 0
+        retour["message"] = message
+        return retour
+
+
 class app(WSGI):
     routes = [
         ('/', Home()),
-        ('/create', CreatToken())
+        ('/create', CreatToken()),
+        ('/check', CheckToken())
     ]
 
 try:
