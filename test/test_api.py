@@ -8,6 +8,27 @@ second_port = 8001
 first_token = 'api-token'
 second_token = '32ewD9S7NbWBx5sN7JpX6S8WhoZLU71a0PBF9Yekwy2Uj7S3zuBDwW0IYRkpGaS8'
 
+
+
+class TestApiBase():
+    def get_response(self, url, head={}, port=80):
+        response = get(url + ":" + str(port) + "/", headers=head)
+        return response
+    def test_base_response_with_token_text(self):
+        headers = {'token':first_token}
+        assert self.get_response(base_url, head=headers, port=first_port).text == '{"message": "hello"}'
+    def test_base_response_with_token(self):
+        headers = {'token':first_token}
+        assert self.get_response(base_url, head=headers, port=first_port).status_code == 200
+    def test_base_response_with_custom_token_text(self):
+        headers = {'token':second_token}
+        assert self.get_response(base_url, head=headers, port=second_port).text == '{"message": "hello"}'
+    def test_base_response_with_custom_token(self):
+        headers = {'token':second_token}
+        assert self.get_response(base_url, head=headers, port=second_port).status_code == 200
+    def test_base_response_without_token(self):
+        assert self.get_response(base_url, port=second_port).status_code == 401
+
 class TestCreateToken():
     def get_response(self, url, head={}, port=80, data='{}'):
         response = post(url + ":" + str(port) + "/create", headers=head, data = data)
@@ -38,21 +59,34 @@ class TestCreateToken():
         second =  self.get_response(base_url, head=headers, port=first_port, data=datas).json()["token"]
         assert first == second
 
-class TestApiBase():
-    def get_response(self, url, head={}, port=80):
-        response = get(url + ":" + str(port) + "/", headers=head)
+class TestCheckToken():
+    def get_response(self, url, head={}, port=80, data='{}', route=''):
+        response = post(url + ":" + str(port) + "/" + route, headers=head, data = data)
         return response
-    def test_base_response_with_token_text(self):
+    def test_id_valid_check_with_data_without_correct_token(self):
         headers = {'token':first_token}
-        assert self.get_response(base_url, head=headers, port=first_port).text == '{"message": "hello"}'
-    def test_base_response_with_token(self):
+        source = 'pioupiou'
+        token = 'lolicool'
+        data2 = '{"source":"' + source + '","token":"' + token +'"}'
+        ret = self.get_response(base_url, head=headers, port=first_port, data=data2, route='check').json()
+        assert ret["is_valid"] == 0
+    def test_is_valid_check_with_data_with_correct_token(self):
         headers = {'token':first_token}
-        assert self.get_response(base_url, head=headers, port=first_port).status_code == 200
-    def test_base_response_with_custom_token_text(self):
-        headers = {'token':second_token}
-        assert self.get_response(base_url, head=headers, port=second_port).text == '{"message": "hello"}'
-    def test_base_response_with_custom_token(self):
-        headers = {'token':second_token}
-        assert self.get_response(base_url, head=headers, port=second_port).status_code == 200
-    def test_base_response_without_token(self):
-        assert self.get_response(base_url, port=second_port).status_code == 401
+        source_id = 15
+        source = 'pioupiou'
+        time_limit = 3600
+        data1 = '{"source":"' + source + '","id":"' + str(source_id) +'","limit_time":"' + str(time_limit) + '"}'
+        token = self.get_response(base_url, head=headers, port=first_port, data=data1, route='create').json()["token"]
+        data2 = '{"source":"' + source + '","token":"' + token +'"}'
+        ret = self.get_response(base_url, head=headers, port=first_port, data=data2, route='check').json()
+        assert ret["is_valid"] == 1
+    def test_id_check_with_data_with_correct_token(self):
+        headers = {'token':first_token}
+        source_id = 15
+        source = 'pioupiou'
+        time_limit = 3600
+        data1 = '{"source":"' + source + '","id":"' + str(source_id) +'","limit_time":"' + str(time_limit) + '"}'
+        token = self.get_response(base_url, head=headers, port=first_port, data=data1, route='create').json()["token"]
+        data2 = '{"source":"' + source + '","token":"' + token +'"}'
+        ret = self.get_response(base_url, head=headers, port=first_port, data=data2, route='check').json()
+        assert ret["id"] == source_id
