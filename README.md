@@ -18,9 +18,27 @@
 
 - /
   * method : GET
+  * header :
+    - token : string
 - /create
   * method : POST
+  * header :
+    - token : string
   * data :
     - source : string
     - id : int
     - limit_time : int (0 = unlimited)
+  * retour :
+    - message : string
+    - token : string
+- /check
+  * method : POST
+  * header :
+    - token : string
+  * data :
+    - source : string
+    - token : string
+  * retour :
+    - message : string
+    - is_valid : int
+    - (if is_valid) id : int
