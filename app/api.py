@@ -58,7 +58,7 @@ class CheckToken(Handler):
         if ret != None:
             message += "valid"
             retour["is_valid"] = 1
-            retour["id"] = ret["source_id"]
+            retour["id"] = int(ret["source_id"])
         else:
             message += "not valid"
             retour["is_valid"] = 0
