@@ -16,6 +16,7 @@
 
 ## Routes
 
+```
 - /
   * method : GET
   * header :
@@ -42,3 +43,28 @@
     - message : string
     - is_valid : int
     - (if is_valid) id : int
+```
+
+## Docker
+
+You can use this api with docker :
+
+```yml
+---
+version: '3'
+services:
+  pytokens:
+    image: 'gnomezworc/pytokens:test'
+    environment:
+     - 'MONGO_HOST=mongo'
+     - 'HOST=0.0.0.0'
+    ports:
+     - '80:8000'
+    depends_on:
+     - 'mongo'
+  mongo:
+    image: 'mongo'
+    ports:
+     - '27017:27017'
+...
+```
