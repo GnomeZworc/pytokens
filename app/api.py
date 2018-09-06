@@ -92,7 +92,8 @@ class app(WSGI):
     routes = [
         ('/', Home()),
         ('/create', CreatToken()),
-        ('/check', CheckToken())
+        ('/check', CheckToken()),
+        ('/delete', DeleteToken())
     ]
 
 try:
