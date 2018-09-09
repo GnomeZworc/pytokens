@@ -33,3 +33,7 @@ class mongo():
         collection = self.api_name + "_" + collection
         self.logs("find one " + str(find) + " in " + collection)
         return self.db[collection].find_one(find)
+    def deleteOne(self, collection, delete):
+        collection = self.api_name + "_" + collection
+        self.logs("delete one " + str(delete) + " in " + collection)
+        return self.db[collection].delete_one(delete)
