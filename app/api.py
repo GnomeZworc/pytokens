@@ -65,12 +65,35 @@ class CheckToken(Handler):
         retour["message"] = message
         return retour
 
+class DeleteToken(Handler):
+    @require(Database)
+    def post(self):
+        source = self.request.data.get("source")
+        token = self.request.data.get("token")
+        if source == None or token == None:
+            raise HTTP_400("we need source and token")
+        message = "this token is "
+        ret = Database.findOne("tokens", {"source":source,"token":token})
+        retour = {}
+        if ret != None:
+            message += "deleted"
+            retour["is_valid"] = 1
+            ret = Database.deleteOne("tokens", {"source":source,"token":token}).deleted_count
+            if ret >= 1:
+                retour["is_deleted"] = 1
+        else:
+            message += "not valid"
+            retour["is_valid"] = 0
+        retour["message"] = message
+        return retour
+
 
 class app(WSGI):
     routes = [
         ('/', Home()),
         ('/create', CreatToken()),
-        ('/check', CheckToken())
+        ('/check', CheckToken()),
+        ('/delete', DeleteToken())
     ]
 
 try:

@@ -90,3 +90,31 @@ class TestCheckToken():
         data2 = '{"source":"' + source + '","token":"' + token +'"}'
         ret = self.get_response(base_url, head=headers, port=first_port, data=data2, route='check').json()
         assert ret["id"] == source_id
+
+class TestDeleteToken():
+    def get_response(self, url, head={}, port=80, data='{}', route=''):
+        response = post(url + ":" + str(port) + "/" + route, headers=head, data = data)
+        return response
+    def test_is_valid_delete_without_valid_token(self):
+        headers = {'token':first_token}
+        source = 'pioupiou'
+        token = 'lol'
+        data = '{"source":"' + source + '","token":"' + token + '"}'
+        ret = self.get_response(base_url, head=headers, port=first_port, data=data, route='delete').json()
+        assert ret["is_valid"] == 0
+    def test_is_valid_delete_with_valid_token(self):
+        headers = {'token':first_token}
+        source = 'pioupiou'
+        data1 = '{"source":"' + source + '","id":1,"limit_time":0}'
+        token = self.get_response(base_url, head=headers, port=first_port, data=data1, route='create').json()["token"]
+        data2 = '{"source":"' + source + '","token":"' + token + '"}'
+        ret = self.get_response(base_url, head=headers, port=first_port, data=data2, route='delete').json()
+        assert ret["is_valid"] == 1
+    def test_is_deleted_delete_with_valid_token(self):
+        headers = {'token':first_token}
+        source = 'pioupiou'
+        data1 = '{"source":"' + source + '","id":1,"limit_time":0}'
+        token = self.get_response(base_url, head=headers, port=first_port, data=data1, route='create').json()["token"]
+        data2 = '{"source":"' + source + '","token":"' + token + '"}'
+        ret = self.get_response(base_url, head=headers, port=first_port, data=data2, route='delete').json()
+        assert ret["is_deleted"] == 1
