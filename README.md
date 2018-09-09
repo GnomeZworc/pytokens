@@ -43,6 +43,17 @@
     - message : string
     - is_valid : int
     - (if is_valid) id : int
+- /delete
+  * method : POST
+  * header :
+    - token : string
+  * data :
+    - source : string
+    - token : string
+  * retour :
+    - message : string
+    - is_valid : int
+    - (if is_valid) is_deleted : int
 ```
 
 ## Docker
