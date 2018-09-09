@@ -2,7 +2,7 @@
 
 ## Version
 
-0.2.0
+0.3.0
 
 ## Build Test
 
@@ -11,6 +11,7 @@
   * develop ![develop](https://travis-ci.org/GnomeZworc/pytokens.svg?branch=develop)
 
 - Version
+  * 0.3.0 ![0.2.0](https://travis-ci.org/GnomeZworc/pytokens.svg?branch=0.3.0)
   * 0.2.0 ![0.2.0](https://travis-ci.org/GnomeZworc/pytokens.svg?branch=0.2.0)
   * 0.1.0 ![0.1.0](https://travis-ci.org/GnomeZworc/pytokens.svg?branch=0.1.0)
 
