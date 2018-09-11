@@ -1,6 +1,7 @@
 # test_capitalize.py
 
 from requests import get, post
+from time import sleep
 
 base_url = "http://127.0.0.1"
 first_port = 8000
@@ -118,3 +119,30 @@ class TestDeleteToken():
         data2 = '{"source":"' + source + '","token":"' + token + '"}'
         ret = self.get_response(base_url, head=headers, port=first_port, data=data2, route='delete').json()
         assert ret["is_deleted"] == 1
+
+class TestTimeDelete():
+    def get_response(self, url, head={}, port=80, data='{}', route=''):
+        response = post(url + ":" + str(port) + "/" + route, headers=head, data = data)
+        return response
+    def test_time_with_correct_time(self):
+        headers = {'token':first_token}
+        source_id = 15
+        source = 'pioupiou'
+        time_limit = 3600
+        data1 = '{"source":"' + source + '","id":"' + str(source_id) +'","limit_time":"' + str(time_limit) + '"}'
+        token = self.get_response(base_url, head=headers, port=first_port, data=data1, route='create').json()["token"]
+        sleep(2)
+        data2 = '{"source":"' + source + '","token":"' + token +'"}'
+        ret = self.get_response(base_url, head=headers, port=first_port, data=data2, route='check').json()
+        assert ret["id"] == source_id
+    def test_time_without_correct_time(self):
+        headers = {'token':first_token}
+        source_id = 18
+        source = 'pioupiou'
+        time_limit = 1
+        data1 = '{"source":"' + source + '","id":"' + str(source_id) +'","limit_time":"' + str(time_limit) + '"}'
+        token = self.get_response(base_url, head=headers, port=first_port, data=data1, route='create').json()["token"]
+        sleep(2)
+        data2 = '{"source":"' + source + '","token":"' + token +'"}'
+        ret = self.get_response(base_url, head=headers, port=first_port, data=data2, route='check').json()
+        assert ret["is_valid"] == 0
