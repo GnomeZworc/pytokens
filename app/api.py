@@ -12,6 +12,7 @@ from functools import wraps
 from variables import env
 from database import mongo
 from require import require
+from time import time
 
 Database = mongo(host=env("MONGO_HOST"), port=env("MONGO_PORT"), database=env("MONGO_DATABASE"), protocol=env("MONGO_PROTOCOL"), api=env("API_NAME"))
 
@@ -37,10 +38,14 @@ class CreatToken(Handler):
         token = generate_token()
         while Database.findOne("tokens", {"token":token}) != None:
             token = generate_token()
+        if int(limit_time) != 0:
+            limit_time = int(time()) + int(limit_time)
         elem = {
             "token":token,
             "source":source,
-            "source_id":source_id
+            "source_id":source_id,
+            "limit_time":limit_time
+
         }
         Database.insert("tokens", elem)
         return {"message":"new token is create", "token":str(token)}
